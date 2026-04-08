@@ -1,4 +1,4 @@
-SRCS = main.c drivers/led/led.c
+SRCS = main.c drivers/led/led.c drivers/clocks/clocks.c
 OBJS = $(SRCS:.c=.o)
 
 main.hex: $(OBJS) startup.o
@@ -16,6 +16,6 @@ program:
 	STM32_Programmer_CLI -c port=SWD -w main.hex 
 
 clean:
-	rm *.o *.elf *.hex
+	rm *.o *.elf *.hex $(OBJS)
 
 .PHONY: clean program
