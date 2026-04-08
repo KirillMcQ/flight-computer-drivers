@@ -1,14 +1,16 @@
-main.hex: main.elf
+SRCS = main.c drivers/led/led.c
+OBJS = $(SRCS:.c=.o)
+
+main.hex: $(OBJS) startup.o
+	arm-none-eabi-gcc -g3 -mcpu=cortex-m4 -mthumb --specs=nosys.specs -T linkerscript.ld $(OBJS) startup.o -o main.elf
 	arm-none-eabi-objcopy -O ihex main.elf main.hex
 
-main.elf: main.o startup.o
-	arm-none-eabi-gcc -g3 -mcpu=cortex-m4 --specs=nosys.specs -T linkerscript.ld main.o startup.o -o main.elf
+
+$(OBJS): %.o : %.c
+	arm-none-eabi-gcc -g3 -mcpu=cortex-m4 -mthumb -c $< -o $@
 
 startup.o: startup.s
 	arm-none-eabi-gcc -g3 -mcpu=cortex-m4 -mthumb -c startup.s -o startup.o
-
-main.o: main.c
-	arm-none-eabi-gcc -g3 -mcpu=cortex-m4 -mthumb -c main.c -o main.o
 
 program:
 	STM32_Programmer_CLI -c port=SWD -w main.hex 
