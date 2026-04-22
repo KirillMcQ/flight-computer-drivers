@@ -8,13 +8,11 @@ int main()
   initClocks();
   initLED1();
   initTIM2();
+  initUART3();
 
   while (1)
   {
-    enableLED1();
     transmitString("Hello, World!");
-    delayMS(1000);
-    disableLED1();
     delayMS(1000);
   };
 }

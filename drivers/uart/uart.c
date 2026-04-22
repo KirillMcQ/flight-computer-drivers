@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <string.h>
 #include "uart.h"
 
 #define USART3_ADDR 0x40004800
@@ -43,7 +44,7 @@ void initUART3()
   // Disable USART3 for configuration
   USART3_CR1 &= ~(1 << 13);
 
-  // 1 start bit, 8 data bits, 0 stop bits
+  // 1 start bit, 8 data bits, 1 stop bits
   USART3_CR1 &= ~(1 << 12);
   USART3_CR2 &= ~(3 << 12);
 
@@ -69,7 +70,7 @@ static void __attribute__((optimize("O0"))) transmitCharacter(char c)
 
 void __attribute__((optimize("O0"))) transmitString(char str[])
 {
-  for (int i = 0; i < sizeof(str) / sizeof(str[0]); i++)
+  for (int i = 0; i < strlen(str); i++)
   {
     transmitCharacter(str[i]);
   }
