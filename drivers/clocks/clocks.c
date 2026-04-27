@@ -18,4 +18,7 @@ void initClocks()
 
   // TIM2
   RCC_APB1ENR |= (1 << 0);
+
+  // I2C1
+  RCC_APB1ENR |= (1 << 21);
 }
