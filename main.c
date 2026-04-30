@@ -16,21 +16,25 @@ int main()
   initIMU();
   initBMP390();
   calibrateLaunchPressure();
+  initLIS2MDLTR();
 
   float accel[3];
   float gyro[3];
+  float mag[3];
 
   while (1)
   {
     readIMUAccel(accel);
     readIMUGyro(gyro);
+    readLIS2MDLTRUt(mag);
 
     float ax = accel[0], ay = accel[1], az = accel[2];
     float gx = gyro[0], gy = gyro[1], gz = gyro[2];
     float altitude = readBMP390AltitudeM();
+    float mx = mag[0], my = mag[1], mz = mag[2];
 
     char dataStr[64];
-    sprintf(dataStr, "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f", ax, ay, az, gx, gy, gz, altitude);
+    sprintf(dataStr, "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f", ax, ay, az, gx, gy, gz, altitude, mx, my, mz);
 
     transmitString(dataStr);
     delayMS(25);

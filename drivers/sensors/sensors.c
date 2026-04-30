@@ -8,6 +8,7 @@
 #define BMI088_GYRO_ADDR 0x68
 #define BMI088_ACCEL_ADDR 0x18
 #define BMP390_ADDR 0x76
+#define LIS2MDLTR_ADDR 0x1E
 #define BMI088_ACCEL_REGISTER_ACC_PWR_CTRL 0x7D
 #define BMI088_ACCEL_REGISTER_ACC_CONF 0x40
 #define BMI088_ACCEL_REGISTER_ACC_RANGE 0x41
@@ -23,6 +24,10 @@
 #define BMP390_CONFIG_REGISTER 0x1F
 #define BMP390_CALIBRATION_DATA_REGISTER 0x31
 #define BMP390_CMD_REGISTER 0x7E
+#define LIS2MDLTR_CFG_REG_A_REGISTER 0x60
+#define LIS2MDLTR_CFG_REG_B_REGISTER 0x61
+#define LIS2MDLTR_CFG_REG_C_REGISTER 0x62
+#define LIS2MDLTR_OUTX_L_REG 0x68
 
 static void readBMP390Calibration();
 static void readBMP390Raw(uint32_t *pressureRaw, uint32_t *tempRaw);
@@ -89,6 +94,18 @@ void initBMP390()
   readBMP390Calibration();
 
   delayMS(100);
+}
+
+void initLIS2MDLTR()
+{
+  // Continuous mode, 100 Hz data rate, high-resolution mode, normal mode, temperature compensation enabled
+  writeToRegister(LIS2MDLTR_ADDR, LIS2MDLTR_CFG_REG_A_REGISTER, 0x8C);
+
+  // Offset cancellation enabled
+  writeToRegister(LIS2MDLTR_ADDR, LIS2MDLTR_CFG_REG_B_REGISTER, 0x02);
+
+  // Block data update enabled
+  writeToRegister(LIS2MDLTR_ADDR, LIS2MDLTR_CFG_REG_C_REGISTER, 0x10);
 }
 
 void readIMUGyro(float *gyro)
@@ -221,4 +238,19 @@ float readBMP390AltitudeM()
   float altitude = 44330.0f * (1.0f - powf(pressurePa / launchPressurePa, 0.19029495f));
 
   return altitude;
+}
+
+void readLIS2MDLTRUt(float *mag)
+{
+  uint8_t raw[6];
+
+  burstReadFromRegister(LIS2MDLTR_ADDR, LIS2MDLTR_OUTX_L_REG, 6, raw);
+
+  int16_t mx_raw = (int16_t)((raw[1] << 8) | raw[0]);
+  int16_t my_raw = (int16_t)((raw[3] << 8) | raw[2]);
+  int16_t mz_raw = (int16_t)((raw[5] << 8) | raw[4]);
+
+  mag[0] = mx_raw * 0.15f;
+  mag[1] = my_raw * 0.15f;
+  mag[2] = mz_raw * 0.15f;
 }
