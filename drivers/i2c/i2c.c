@@ -122,6 +122,28 @@ void __attribute__((optimize("O0"))) burstReadFromRegister(uint8_t deviceAddr, u
   while (!(I2C1_SR1 & (1 << 1)))
     ;
 
+  // Special case: read exactly 1 byte
+  if (n == 1)
+  {
+    // Disable Ack before clearing ADDR
+    I2C1_CR1 &= ~(1 << 10);
+
+    // Clear ADDR
+    (void)I2C1_SR1;
+    (void)I2C1_SR2;
+
+    // Stop transmission before reading final byte
+    I2C1_CR1 |= (1 << 9);
+
+    // Wait for byte received
+    while (!(I2C1_SR1 & (1 << 6)))
+      ;
+
+    buffer[0] = I2C1_DR;
+
+    return;
+  }
+
   (void)I2C1_SR1;
   (void)I2C1_SR2;
 
