@@ -5,6 +5,7 @@
 #include "../uart/uart.h"
 #include <stdio.h>
 
+#define DEGS_TO_RADS 0.01745329251f
 #define BMI088_GYRO_ADDR 0x68
 #define BMI088_ACCEL_ADDR 0x18
 #define BMP390_ADDR 0x76
@@ -113,9 +114,9 @@ void readIMUGyro(float *gyro)
   uint8_t gyroBuffer[6];
   burstReadFromRegister(BMI088_GYRO_ADDR, 0x02, 6, gyroBuffer);
 
-  gyro[0] = (int16_t)((gyroBuffer[1] * 256) + gyroBuffer[0]) * (2000.0f / 32768.0f);
-  gyro[1] = (int16_t)((gyroBuffer[3] * 256) + gyroBuffer[2]) * (2000.0f / 32768.0f);
-  gyro[2] = (int16_t)((gyroBuffer[5] * 256) + gyroBuffer[4]) * (2000.0f / 32768.0f);
+  gyro[0] = (int16_t)((gyroBuffer[1] * 256) + gyroBuffer[0]) * (2000.0f / 32768.0f) * DEGS_TO_RADS;
+  gyro[1] = (int16_t)((gyroBuffer[3] * 256) + gyroBuffer[2]) * (2000.0f / 32768.0f) * DEGS_TO_RADS;
+  gyro[2] = (int16_t)((gyroBuffer[5] * 256) + gyroBuffer[4]) * (2000.0f / 32768.0f) * DEGS_TO_RADS;
 }
 
 void readIMUAccel(float *accel)

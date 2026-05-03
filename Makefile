@@ -1,4 +1,4 @@
-SRCS = main.c drivers/led/led.c drivers/clocks/clocks.c drivers/uart/uart.c drivers/timer/timer.c drivers/i2c/i2c.c drivers/sensors/sensors.c
+SRCS = main.c drivers/led/led.c drivers/clocks/clocks.c drivers/uart/uart.c drivers/timer/timer.c drivers/i2c/i2c.c drivers/sensors/sensors.c drivers/quaternion/quaternion.c
 OBJS = $(SRCS:.c=.o)
 
 main.hex: $(OBJS) startup.o

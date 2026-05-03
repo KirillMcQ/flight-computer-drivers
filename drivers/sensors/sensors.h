@@ -4,7 +4,7 @@
 void initIMU();
 void initBMP390();
 void initLIS2MDLTR();
-void readIMUGyro(float *gyro);
+void readIMUGyro(float *gyro); // RAD/s
 void readIMUAccel(float *accel);
 void calibrateLaunchPressure();
 float readBMP390PressurePa();
