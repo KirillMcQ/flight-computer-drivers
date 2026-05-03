@@ -27,6 +27,7 @@ int main()
   float mag[3];
 
   uint32_t lastUs = micros();
+  uint32_t lastPrintUs = micros();
   Quaternion q = {1, 0, 0, 0};
 
   while (1)
@@ -45,7 +46,6 @@ int main()
 
       float ax = accel[0], ay = accel[1], az = accel[2];
       float gx = gyro[0], gy = gyro[1], gz = gyro[2];
-      float altitude = readBMP390AltitudeM();
       float mx = mag[0], my = mag[1], mz = mag[2];
 
       Quaternion sw = {0, gyro[0], gyro[1], gyro[2]};
@@ -56,8 +56,16 @@ int main()
 
       // Euler angle orientation
       float yaw = getEulerAngleYaw(q) * RADIANS_TO_DEGREES, pitch = getEulerAnglePitch(q) * RADIANS_TO_DEGREES, roll = getEulerAngleRoll(q) * RADIANS_TO_DEGREES;
+    }
 
-      char dataStr[64];
+    // 20 Hz slower loop for slower sensors and peripherals
+    if ((uint32_t)(curUs - lastPrintUs) >= 50000U)
+    {
+      lastPrintUs = curUs;
+      float altitude = readBMP390AltitudeM();
+      float yaw = getEulerAngleYaw(q) * RADIANS_TO_DEGREES, pitch = getEulerAnglePitch(q) * RADIANS_TO_DEGREES, roll = getEulerAngleRoll(q) * RADIANS_TO_DEGREES;
+      char dataStr[128];
+
       sprintf(dataStr, "Yaw: %.3f, Pitch: %.3f, Roll: %.3f (degrees)", yaw, pitch, roll);
       transmitString(dataStr);
     }
