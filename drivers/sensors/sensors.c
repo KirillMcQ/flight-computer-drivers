@@ -30,6 +30,10 @@
 #define LIS2MDLTR_CFG_REG_C_REGISTER 0x62
 #define LIS2MDLTR_OUTX_L_REG 0x68
 
+static float gyroXBias = 0;
+static float gyroYBias = 0;
+static float gyroZBias = 0;
+
 static void readBMP390Calibration();
 static void readBMP390Raw(uint32_t *pressureRaw, uint32_t *tempRaw);
 
@@ -114,9 +118,9 @@ void readIMUGyro(float *gyro)
   uint8_t gyroBuffer[6];
   burstReadFromRegister(BMI088_GYRO_ADDR, 0x02, 6, gyroBuffer);
 
-  gyro[0] = (int16_t)((gyroBuffer[1] * 256) + gyroBuffer[0]) * (2000.0f / 32768.0f) * DEGS_TO_RADS;
-  gyro[1] = (int16_t)((gyroBuffer[3] * 256) + gyroBuffer[2]) * (2000.0f / 32768.0f) * DEGS_TO_RADS;
-  gyro[2] = (int16_t)((gyroBuffer[5] * 256) + gyroBuffer[4]) * (2000.0f / 32768.0f) * DEGS_TO_RADS;
+  gyro[0] = ((int16_t)((gyroBuffer[1] * 256) + gyroBuffer[0]) * (2000.0f / 32768.0f) * DEGS_TO_RADS) - gyroXBias;
+  gyro[1] = ((int16_t)((gyroBuffer[3] * 256) + gyroBuffer[2]) * (2000.0f / 32768.0f) * DEGS_TO_RADS) - gyroYBias;
+  gyro[2] = ((int16_t)((gyroBuffer[5] * 256) + gyroBuffer[4]) * (2000.0f / 32768.0f) * DEGS_TO_RADS) - gyroZBias;
 }
 
 void readIMUAccel(float *accel)
@@ -199,6 +203,27 @@ void calibrateLaunchPressure()
   }
 
   launchPressurePa = sum / 100.0f;
+}
+
+void calibrateGyro()
+{
+  float gyro[3];
+
+  float xB = 0.0f, yB = 0.0f, zB = 0.0f;
+
+  for (int i = 0; i < 100; i++)
+  {
+    readIMUGyro(gyro);
+    xB += gyro[0];
+    yB += gyro[1];
+    zB += gyro[2];
+    transmitString("Calibrating Gyroscope");
+    delayMS(25);
+  }
+
+  gyroXBias = xB / 100.0f;
+  gyroYBias = yB / 100.0f;
+  gyroZBias = zB / 100.0f;
 }
 
 float readBMP390PressurePa()

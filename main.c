@@ -20,6 +20,7 @@ int main()
   initIMU();
   initBMP390();
   calibrateLaunchPressure();
+  calibrateGyro();
   initLIS2MDLTR();
 
   float accel[3];
