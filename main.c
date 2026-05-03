@@ -66,7 +66,7 @@ int main()
       float yaw = getEulerAngleYaw(q) * RADIANS_TO_DEGREES, pitch = getEulerAnglePitch(q) * RADIANS_TO_DEGREES, roll = getEulerAngleRoll(q) * RADIANS_TO_DEGREES;
       char dataStr[128];
 
-      sprintf(dataStr, "Yaw: %.3f, Pitch: %.3f, Roll: %.3f (degrees)", yaw, pitch, roll);
+      sprintf(dataStr, "%.3f,%.3f,%.3f", yaw, pitch, roll);
       transmitString(dataStr);
     }
   };
